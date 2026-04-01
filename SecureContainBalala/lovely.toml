@@ -1,0 +1,121 @@
+[manifest]
+version = "1.0.0"
+priority = 11
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "if not instant then"
+position = "before"
+payload = '''
+sendDebugMessage('[SCPB] - ???')
+local planetsm = SMODS.find_card("j_scpb_malkuth")
+
+for i = 1, #planetsm do
+        
+            sendDebugMessage('[SCPB] - !!!')
+            planetsm[i]:juice_up(0.3, 0.4)
+            G.E_MANAGER:add_event(Event{func = function()
+                                card_eval_status_text(
+                                card,
+                                'extra',
+                                nil, nil, nil,
+                                {message = '+'..planetsm[i].ability.extra.mult, colour = G.C.RED, instant = true})
+                            return true end})
+            if not SMODS.is_eternal(G.jokers.cards[#G.jokers.cards], planetsm[i]) then
+            G.jokers.cards[#G.jokers.cards]:start_dissolve({ HEX("756b6b") }, nil, 1.6)
+            end
+            G.GAME.hands[hand].mult = G.GAME.hands[hand].mult + to_big(planetsm[i].ability.extra.mult)
+        
+end
+
+'''
+match_indent = true
+
+
+# Activated Ability Button UI (1/4)
+# Clear use button before creating it
+# G.UIDEF.use_and_sell_buttons()
+[[patches]]
+[patches.pattern]
+target = 'functions/UI_definitions.lua'
+pattern = '''
+local use = nil
+'''
+position = 'after'
+payload = '''
+local scpb_activate_ability = nil
+'''
+match_indent = true
+
+# Activated Ability Button UI (2/4)
+# Defines the use button used for activated jokers
+# G.UIDEF.use_and_sell_buttons()
+[[patches]]
+[patches.pattern]
+target = 'functions/UI_definitions.lua'
+pattern = '''
+if card.area and card.area.config.type == 'joker' then
+'''
+position = 'after'
+payload = '''
+if card.config.center.scpb and card.config.center.scpb.use_ability then 
+    local use_button = {n=G.UIT.T, config={text = localize('b_use'),colour = G.C.UI.TEXT_LIGHT, scale = card.config.center.scpb.ability_cost and card.scpb_ability_cost_label and 0.35 or 0.55, shadow = true}}
+    scpb_activate_ability = {n=G.UIT.C, config={align = "cm"}, nodes={
+        {n=G.UIT.C, config={ref_table = card, align = "cm",maxw = 1.25, padding = 0.1, r=0.08, minw = 1.25, minh = (card.area and card.area.config.type == 'joker') and 0 or 1, hover = true, shadow = true, colour = G.C.UI.BACKGROUND_INACTIVE, button = 'SCPB_use_active_ability_button', func = 'SCPB_can_use_active_ability_button'}, nodes={
+            {n=G.UIT.B, config = {w=0.1,h=0.6}},
+                card.config.center.scpb.ability_cost and card.scpb_ability_cost_label and {n=G.UIT.C, config={align = "tm"}, nodes={
+                    {n=G.UIT.R, config={align = "cm", maxw = 1.25}, nodes={
+                        use_button,
+                    }},
+                    {n=G.UIT.R, config={align = "cm"}, nodes={
+                        {n=G.UIT.T, config={text = '-'..localize('$'),colour = G.C.WHITE, scale = 0.4, shadow = true}},
+                        {n=G.UIT.T, config={ref_table = card, ref_value = 'scpb_ability_cost_label',colour = G.C.WHITE, scale = 0.55, shadow = true}}
+                    }
+                } 
+            }} or use_button
+        }}
+    }}
+end
+'''
+match_indent = true
+
+# Activated Ability Button UI (3/4)
+# Place the use button for activated jokers
+# G.UIDEF.use_and_sell_buttons()
+[[patches]]
+[patches.pattern]
+target = 'functions/UI_definitions.lua'
+pattern = '''
+{n=G.UIT.R, config={align = 'cl'}, nodes={
+    sell
+}},
+'''
+position = 'after'
+payload = '''
+{n=G.UIT.R, config={align = 'cr'}, nodes={
+    scpb_activate_ability
+}},
+'''
+match_indent = true
+
+# Activated Ability Button UI (4/4)
+# Attaches the "Use" button to activated ability patches
+# Used for controller
+# G.UIDEF.card_focus_ui()
+[[patches]]
+[patches.pattern]
+target = 'functions/UI_definitions.lua'
+pattern = '''
+base_attach.children.sell = G.UIDEF.card_focus_button{
+'''
+position = 'before'
+payload = '''
+if card.config.center.scpb and card.config.center.scpb.use_ability then 
+    base_attach.children.scpb_activate_ability = G.UIDEF.card_focus_button{
+        card = card, parent = base_attach, type = 'use',
+        func = 'SCPB_can_use_active_ability_button', button = 'SCPB_use_active_ability_button', card_width = card_width
+    }
+end
+'''
+match_indent = true
