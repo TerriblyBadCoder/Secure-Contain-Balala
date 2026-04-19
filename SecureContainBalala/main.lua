@@ -2334,6 +2334,56 @@ SMODS.Joker{
 }
 SMODS.DrawStep({
     key = 'test',
+    order = -1000,
+    func = function(card, layer)
+         if card.config.center.key=="j_scpb_housewithpeople" and card.ability and tablecontains(G.jokers.cards,card) then
+            if not card.children.houses then
+                    local sprited = Sprite(card.T.x, card.T.y, card.T.w, card.T.h, G.ASSET_ATLAS['scpb_Jokers'], {x = 5, y = 3})
+                    card.children.houses=sprited
+                    sprited.states.visible = false
+
+                    sprited = Sprite(card.T.x, card.T.y, card.T.w, card.T.h, G.ASSET_ATLAS['scpb_Jokers'], {x = 5, y = 3})
+                    card.children.houses1=sprited
+                    sprited.states.visible = false
+
+                    sprited = Sprite(card.T.x, card.T.y, card.T.w, card.T.h, G.ASSET_ATLAS['scpb_Jokers'], {x = 5, y = 3})
+                    card.children.houses2=sprited
+                    sprited.states.visible = false
+
+                    sprited = Sprite(card.T.x, card.T.y, card.T.w, card.T.h, G.ASSET_ATLAS['scpb_Jokers'], {x = 5, y = 2})
+                    card.children.houses3=sprited
+                    sprited.states.visible = false
+
+                    sprited = Sprite(card.T.x, card.T.y, card.T.w, card.T.h, G.ASSET_ATLAS['scpb_Jokers'], {x = 5, y = 2})
+                    card.children.houses4=sprited
+                    sprited.states.visible = false
+                    sprited = Sprite(card.T.x, card.T.y, card.T.w, card.T.h, G.ASSET_ATLAS['scpb_Jokers'], {x = 5, y = 2})
+                    card.children.houses5=sprited
+                    sprited.states.visible = false
+                    sprited = Sprite(card.T.x, card.T.y, card.T.w, card.T.h, G.ASSET_ATLAS['scpb_Jokers'], {x = 5, y = 2})
+                    card.children.houses6=sprited
+                    sprited.states.visible = false
+            end
+            local houses = {card.children.houses,card.children.houses1,card.children.houses2,card.children.houses3,card.children.houses4,card.children.houses5,card.children.houses6}
+            for i = 1, #houses do
+                local sprited2=houses[i]
+                card.children.center.CT.w = card.children.center.CT.w*(i/7.0)
+                card.children.center.CT.h = card.children.center.CT.h*(i/7.0)
+                card.children.center.CT.x=card.children.center.CT.x+((0.0-i)/14.0+0.5)*G.CARD_W
+                card.children.center.CT.y=card.children.center.CT.y+((0.0-i)/14.0+0.5)*G.CARD_H
+                sprited2:draw_shader('dissolve', nil, nil, nil, card.children.center, 0, 0)
+                sprited2.role.draw_major = card
+                card.children.center.CT.x=card.children.center.CT.x-((0.0-i)/14.0+0.5)*G.CARD_W
+                card.children.center.CT.y=card.children.center.CT.y-((0.0-i)/14.0+0.5)*G.CARD_H
+                card.children.center.CT.w = card.children.center.CT.w/(i/7.0)
+                card.children.center.CT.h = card.children.center.CT.h/(i/7.0)
+            end
+        end
+
+    end
+})
+SMODS.DrawStep({
+    key = 'mark',
     order = 500,
     func = function(card, layer)
         if not card.ability.marked_death then
@@ -2361,6 +2411,7 @@ SMODS.DrawStep({
             card.children.mark.CT.h = card.CT.h*card.ability.marked_death_lerp
             card.children.mark:draw_shader('dissolve', nil, nil, nil, card.children.mark, 0, 0)
         end
+       
     end
 })
   SMODS.Joker{
