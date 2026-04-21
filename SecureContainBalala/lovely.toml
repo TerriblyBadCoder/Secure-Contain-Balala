@@ -5,8 +5,8 @@ priority = 11
 [[patches]]
 [patches.pattern]
 target = "functions/common_events.lua"
-pattern = "if not instant then"
-position = "before"
+pattern = "amount = amount or 1"
+position = "after"
 payload = '''
 sendDebugMessage('[SCPB] - ???')
 local planetsm = SMODS.find_card("j_scpb_malkuth")

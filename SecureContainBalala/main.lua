@@ -2336,6 +2336,8 @@ SMODS.DrawStep({
     key = 'test',
     order = -1000,
     func = function(card, layer)
+        
+        local timer = (G.TIMERS.REAL * G.ANIMATION_FPS * 0.15) + 20
          if card.config.center.key=="j_scpb_housewithpeople" and card.ability and tablecontains(G.jokers.cards,card) then
             if not card.children.houses then
                     local sprited = Sprite(card.T.x, card.T.y, card.T.w, card.T.h, G.ASSET_ATLAS['scpb_Jokers'], {x = 5, y = 3})
@@ -2371,12 +2373,14 @@ SMODS.DrawStep({
                 card.children.center.CT.h = card.children.center.CT.h*(i/7.0)
                 card.children.center.CT.x=card.children.center.CT.x+((0.0-i)/14.0+0.5)*G.CARD_W
                 card.children.center.CT.y=card.children.center.CT.y+((0.0-i)/14.0+0.5)*G.CARD_H
+                card.children.center.CT.r = card.children.center.CT.r+(1.0-(i/7.0))*math.sin(timer*0.6+i/5.0)
                 sprited2:draw_shader('dissolve', nil, nil, nil, card.children.center, 0, 0)
                 sprited2.role.draw_major = card
                 card.children.center.CT.x=card.children.center.CT.x-((0.0-i)/14.0+0.5)*G.CARD_W
                 card.children.center.CT.y=card.children.center.CT.y-((0.0-i)/14.0+0.5)*G.CARD_H
                 card.children.center.CT.w = card.children.center.CT.w/(i/7.0)
                 card.children.center.CT.h = card.children.center.CT.h/(i/7.0)
+                card.children.center.CT.r = card.children.center.CT.r-(1.0-(i/7.0))*math.sin(timer*0.6+i/5.0)
             end
         end
 
@@ -2414,6 +2418,55 @@ SMODS.DrawStep({
        
     end
 })
+SMODS.Joker{
+    key = 'housewithpeople', --joker key
+    loc_txt = { -- local text
+        name = 'House with People in it',
+        text = {
+            'Unobtainable? huh? Then why is it here?'
+        },
+        --[[unlock = {
+            'Be {C:legendary}cool{}',
+        }]]
+    },
+    article_credits = {"House with people in it","SCP-9044"},
+    atlas = 'Jokers', --atlas' key
+    rarity = 1, --rarity: 1 = Common, 2 = Uncommon, 3 = Rare, 4 = Legendary
+    --soul_pos = { x = 0, y = 0 },
+    cost = 3, --cost
+    unlocked = true, --where it is unlocked or not: if true, 
+    discovered = true, --whether or not it starts discovered
+    blueprint_compat = true, --can it be blueprinted/brainstormed/other
+    eternal_compat = false, --can it be eternal
+    perishable_compat = false, --can it be perishable
+    pos = {x = 5, y = 4}, --position in atlas, starts at 0, scales by the atlas' card size (px and py): {x = 1, y = 0} would mean the sprite is 71 pixels to the right
+    config = { 
+      extra = {
+        chips = 0,
+        additional = 3
+      }
+    },
+    loc_vars = function(self,info_queue,center)
+        
+        return {vars = {center.ability.extra.chips,center.ability.extra.additional}}
+    end,
+    check_for_unlock = function(self, args)
+        unlock_card(self) --unlocks the card if it isnt unlocked
+    end,
+    
+    calculate = function(self,card,context)
+       
+    end,
+    add_to_deck = function(self, card, from_debuff)
+        return
+    end,
+    in_pool = function(self,wawa,wawa2)
+        --whether or not this card is in the pool, return true if it is, return false if its not
+        return false
+    end,
+    update = function(self, card)
+    end
+}
   SMODS.Joker{
     key = 'alexthorley', --joker key
     loc_txt = { -- local text
